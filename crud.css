@@ -1,0 +1,27 @@
+table {
+    border-collapse: collapse;
+    border: 2px solid black;
+}
+
+th {
+    font-family: 'Rock Salt', cursive;
+    padding: 20px;
+    font-style: italic;
+    text-align: center;
+    letter-spacing: 1px;
+    border: 2px solid black;
+}
+
+td {
+    letter-spacing: 1px;
+    text-align: left;
+    border: 1px solid black;
+}
+
+.caption {
+    font-size: 40px;
+    font-family: 'Rock Salt', cursive;
+    padding: 5px;
+    font-style: italic;
+    letter-spacing: 1px;
+}
