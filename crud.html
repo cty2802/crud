@@ -2,34 +2,37 @@
 <html lang="en">
 
 <head>
-    <script src="crud.js"></script>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="crud.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exchange rate</title>
+    <script type="module" src="component.js"></script>
 </head>
 
 <body>
+    <p class="caption">Офіційний курс гривні щодо іноземних валют</p>
+    <P>Choose date: <input type="date" name="calendar" id="chooseDate">
+        <button id="btnShowFromLocalStorage" onclick="onBtnShowFromLocalStorage()">Show from local storage</button>
+        <button id=" btnReloadFromServer " onclick="onBtnReloadFromServer()">Reload from server</button></P>
+    <!-- <button><img src="pngwing.com.png " width="15 " height="15 " alt="Корзина " 
+            style="vertical-align: middle "> Delete</button></p> -->
+    <p><button id="add " onclick="onBtnAdd() ">Add</button>
+        <button id="save " onclick="onBtnSave() ">Save</button></p>
+    <p class="fillCurrentgDate "></p>
     <table>
-        <p class="caption">Офіційний курс гривні щодо іноземних валют</p>
-        <P>Choose date: <input type="date" name="calendar">
-            <button>Show from local storage</button>
-            <button>Reload from server</button></P>
-        <!-- <button><img src="pngwing.com.png" width="15" height="15" alt="Корзина" 
-            style="vertical-align: middle"> Delete</button></p> -->
-        <p><button>Add</button></p>
-        <p>Дані на _____________________</p>
         <thead>
             <tr>
-                <th>Код цифровий</th>
-                <th>Код літерний</th>
-                <th>Кількість одиниць валюти</th>
-                <th>Назва валюти</th>
-                <th>Офіційний курс </th>
+                <td>Код цифровий</td>
+                <td>Код літерний</td>
+                <td>Кількість одиниць валюти</td>
+                <td>Назва валюти</td>
+                <td>Офіційний курс </td>
+                <td>Дата</td>
+                <td>Кнопки</td>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="container ">
         </tbody>
     </table>
 </body>
