@@ -3,7 +3,11 @@ table {
     border: 2px solid black;
 }
 
-th {
+thead {
+    font-size: 20px;
+}
+
+tr {
     font-family: 'Rock Salt', cursive;
     padding: 20px;
     font-style: italic;
@@ -14,7 +18,7 @@ th {
 
 td {
     letter-spacing: 1px;
-    text-align: left;
+    text-align: center;
     border: 1px solid black;
 }
 
