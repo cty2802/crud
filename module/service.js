@@ -10,25 +10,11 @@ class Service {
         }
     }
 
-    getLocalData(date) {
-        let choosenDate = document.getElementById('chooseDate');
-        let newDate = choosenDate.value.replace("-", "").replace("-", "");
-        let arrayCurrency = [];
-        arrayCurrency = JSON.parse(localStorage.getItem(newDate));
-        if (localStorage[`${newDate}`]) {
-            return arrayCurrency;
-        } else {
-            this.getServerData(date);
-            console.log(arrayCurrency);
-            return arrayCurrency;
-        }
-    }
+
 
     async getServerData(date) {
-        let choosenDate = document.getElementById('chooseDate');
-        let newDate = choosenDate.value.replace("-", "").replace("-", "");
         let arrayCurrency = [];
-        let currency = await this.getCurrency(newDate);
+        let currency = await this.getCurrency(date);
         currency.forEach(arr => {
             let obj = new Object();
             obj.r030 = `${arr.r030}`;
@@ -40,32 +26,46 @@ class Service {
             obj.quantity = 1;
             arrayCurrency[arrayCurrency.length] = obj;
         })
-        localStorage.setItem(`${newDate}`, JSON.stringify(arrayCurrency));
-        console.log(arrayCurrency);
+        localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
         return arrayCurrency;
     }
 
 
 
-    create() {
-        let choosenDate = document.getElementById('chooseDate');
-        let newDate = choosenDate.value.replace("-", "").replace("-", "");
-        let arrayCurrency = JSON.parse(localStorage.getItem(`${newDate}`));
-        let newCurr = new Object();
-        newCurr.r030 = document.getElementById('r030').value;
-        newCurr.txt = document.getElementById('txt').value;
-        newCurr.quantity = document.getElementById('quantity').value;
-        newCurr.cc = document.getElementById('cc').value;
-        newCurr.rate = document.getElementById('rate').value;
-        newCurr.exchangedate = `${newDate}`;
-        newCurr.id = document.getElementById('r030').value;
-        arrayCurrency[arrayCurrency.length] = newCurr;
-        localStorage.setItem(`${newDate}`, JSON.stringify(arrayCurrency));
+    getLocalData(dateChoosen) {
+        let arrayCurrency = [];
+        arrayCurrency = JSON.parse(localStorage.getItem(dateChoosen));
+        if (localStorage[`${dateChoosen}`]) {
+            return arrayCurrency;
+        } else {
+            this.getServerData(dateChoosen);
+            return arrayCurrency;
+        }
     }
 
+
+    create(obj, date) {
+        let arrayCurrency = this.getLocalData(date);
+        arrayCurrency.push(obj);
+        localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
+    }
+
+
+    delete(id, date) {
+        let arrayCurrency = this.getLocalData(date);
+        let ind = arrayCurrency.findIndex((el) => {
+            return el.id == id;
+        });
+        arrayCurrency.splice(ind, 1);
+        localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
+    }
+
+
     read(id, date) {}
+
+
     update(obj) {}
-    delete(id, date) {}
+
 
 }
 
