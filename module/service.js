@@ -11,7 +11,6 @@ class Service {
     }
 
 
-
     async getServerData(date) {
         let arrayCurrency = [];
         let currency = await this.getCurrency(date);
