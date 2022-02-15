@@ -68,7 +68,7 @@ async function onBtnUpdate(id) {
             <td><input id="ccSave" value = "${arrayCurrency[ind].cc}" style="text-align: center" maxlength = "3"></td>
             <td><input id="rateSave" value = "${arrayCurrency[ind].rate}" style="text-align: center"></td>
             <td> ${arrayCurrency[ind].exchangedate} </td>
-            <td><button type = "submit" onclick = "onBtnSave(${arrayCurrency[i].id})">Save</button>
+            <td><button type = "submit" onclick = "onBtnSaveForUpdate(${arrayCurrency[i].id})">Save</button>
             <button onclick = "onBtnCancel()">Cancel</button></td>`;
             html += htmlSegment;
             i++;
@@ -88,7 +88,7 @@ async function onBtnUpdate(id) {
     container.innerHTML = html;
 }
 
-async function onBtnSave(id) {
+async function onBtnSaveForUpdate(id) {
     let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
     let array = await service.getLocalData(dateTable);
     let newCurr = new Object();
@@ -136,32 +136,68 @@ async function onBtnCancel() {
     drawTable(dateTable, array);
 }
 
-// async function onBtnAdd(date) {
-//     date = dateTable;//     
-//     let dateFromField = date[6] + date[7] + "." + date[4] + date[5] + "." + date[0] + date[1] + date[2] + date[3];
-//     let html = '';
-//     let htmlSegment = `
-//     <td><input id="r030"></input></td>
-//         <td><input id="txt"></input></td>
-//         <td><input id="quantity"></input></td>
-//         <td><input id="cc"></input></td>
-//         <td><input id="rate"></input></td>
-//         <td id="dateInput">${dateFromField}</td>
-//         <td><button id='del'>Delete</button></td>`;
-//     html += htmlSegment;
-//     let container = document.querySelector('.container');
-//     container.innerHTML = html;
-//     let htmlDate = '';
-//     let htmlDateFilling = `Дані на ${dateFromField}`;
-//     htmlDate += htmlDateFilling;
-//     let containerDate = document.querySelector('.fillCurrentgDate');
-//     containerDate.innerHTML = htmlDate;
-// }
+async function onBtnAdd() {
+    let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
+    let html = '';
+    let arrayCurrency = await service.getLocalData(dateTable);
+    let htmlSegment = `
+    <td><input id="r030Add"></input></td>
+        <td><input id="textAdd"></input></td>
+        <td><input id="quantityAdd"></input></td>
+        <td><input id="ccAdd"></input></td>
+        <td><input id="rateAdd"></input></td>
+        <td id="dateInput">${dateFromField}</td>
+        <td><button type = "submit" onclick = "onBtnSaveForAdd()">Save</button>
+        <button onclick = "onBtnCancel()">Cancel</button></td><tr>`;
+    html += htmlSegment;
+    for (let i = 0; i < arrayCurrency.length; i++) {
+        htmlSegment = `<tr>
+    <td> ${arrayCurrency[i].r030} </td>
+    <td style="text-align: left"> ${ arrayCurrency[i].txt} </td>
+    <td>${ arrayCurrency[i].quantity}</td>
+    <td > ${arrayCurrency[i].cc} </td>
+    <td > ${arrayCurrency[i].rate} </td>
+    <td> ${arrayCurrency[i].exchangedate} </td>
+    <td><button onclick="onBtnUpdate(${arrayCurrency[i].id})">Update</button>
+    <button id='del' onclick="onBtnDel(${arrayCurrency[i].id})">Delete</button></td><tr>`;
+        html += htmlSegment;
+    }
+    let container = document.querySelector('.container');
+    container.innerHTML = html;
+    let htmlDate = '';
+    let htmlDateFilling = `Дані на ${dateFromField}`;
+    htmlDate += htmlDateFilling;
+    let containerDate = document.querySelector('.fillCurrentgDate');
+    containerDate.innerHTML = htmlDate;
+}
 
+async function onBtnSaveForAdd() {
+    let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
+    let array = await service.getLocalData(dateTable);
+    let newCurr = new Object();
+    newCurr.r030 = document.getElementById('r030Add').value;
+    newCurr.txt = document.getElementById('textAdd').value;
+    newCurr.quantity = document.getElementById('quantityAdd').value;
+    newCurr.cc = document.getElementById('ccAdd').value;
+    newCurr.rate = document.getElementById('rateAdd').value;
+    newCurr.id = document.getElementById('r030Add').value
+    newCurr.exchangedate = dateFromField;
+    let error = validateCurrency(newCurr);
+    if (error) {
+        alert(error);
+        return;
+    }
+    service.create(newCurr, dateTable);
+    array = await service.getLocalData(dateTable);
+    drawTable(dateTable, array);
+}
+
+
+window.onBtnSaveForAdd = onBtnSaveForAdd;
 window.onBtnUpdate = onBtnUpdate;
 window.onBtnCancel = onBtnCancel;
 window.onBtnDel = onBtnDel;
 window.onBtnShowFromLocalStorage = onBtnShowFromLocalStorage;
-//window.onBtnAdd = onBtnAdd;
-window.onBtnSave = onBtnSave;
+window.onBtnAdd = onBtnAdd;
+window.onBtnSaveForUpdate = onBtnSaveForUpdate;
 window.onBtnReloadFromServer = onBtnReloadFromServer;
