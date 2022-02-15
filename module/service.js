@@ -10,7 +10,6 @@ class Service {
         }
     }
 
-
     async getServerData(date) {
         let arrayCurrency = [];
         let currency = await this.getCurrency(date);
@@ -29,8 +28,6 @@ class Service {
         return arrayCurrency;
     }
 
-
-
     getLocalData(dateChoosen) {
         let arrayCurrency = [];
         arrayCurrency = JSON.parse(localStorage.getItem(dateChoosen));
@@ -42,13 +39,11 @@ class Service {
         }
     }
 
-
     create(obj, date) {
         let arrayCurrency = this.getLocalData(date);
         arrayCurrency.push(obj);
         localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
     }
-
 
     delete(id, date) {
         let arrayCurrency = this.getLocalData(date);
@@ -59,13 +54,20 @@ class Service {
         localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
     }
 
+    read(id, date) {
+        let arrayCurrency = this.getLocalData(date);
+        let ind = arrayCurrency.findIndex((el) => {
+            return el.id == id;
+        });
+        return ind;
+    }
 
-    read(id, date) {}
-
-
-    update(obj) {}
-
-
+    update(obj, ind, date, id) {
+        let arrayCurrency = this.getLocalData(date);
+        ind = this.read(id, date);
+        arrayCurrency[ind] = obj;
+        localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
+    }
 }
 
 

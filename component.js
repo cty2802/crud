@@ -1,6 +1,5 @@
 import { Service } from './module/service.js';
 let service = new Service();
-
 let dateTable = null;
 
 function getChoosenDate() {
@@ -8,7 +7,6 @@ function getChoosenDate() {
     let dateChoosen = date.value.replace("-", "").replace("-", "");
     return dateChoosen;
 }
-
 
 function drawTable(date, arrayCurrency) {
     dateTable = date;
@@ -21,7 +19,9 @@ function drawTable(date, arrayCurrency) {
             <td > ${arrayCurrency[i].cc} </td>
            <td > ${arrayCurrency[i].rate} </td>
             <td> ${arrayCurrency[i].exchangedate} </td>
-            <td><button id='del' onclick="onBtnDel(${arrayCurrency[i].id})">Delete</button></td><tr>`;
+            <td><button onclick="onBtnUpdate(${arrayCurrency[i].id})">Update</button>
+            <button id='del' onclick="onBtnDel(${arrayCurrency[i].id})"><img src="pngwing.com.png " width="15 " height="15 " alt="Корзина " 
+            style="vertical-align: middle ">Delete</button></td><tr>`;
         html += htmlSegment;
     }
     let container = document.querySelector('.container');
@@ -33,7 +33,6 @@ function drawTable(date, arrayCurrency) {
     containerDate.innerHTML = htmlDate;
 }
 
-
 async function onBtnReloadFromServer() {
     let date = getChoosenDate()
     let array = await service.getServerData(date);
@@ -41,75 +40,128 @@ async function onBtnReloadFromServer() {
     dateTable = date;
 }
 
-
 async function onBtnShowFromLocalStorage() {
     let date = getChoosenDate();
     let array = await service.getLocalData(date);
     drawTable(date, array);
 }
 
-
-async function onBtnAdd() {
-    let date = dateTable;
-    let dateFromField = date[6] + date[7] + "." + date[4] + date[5] + "." + date[0] + date[1] + date[2] + date[3];
-    let html = '';
-    let htmlSegment = ` < tr > < td > < input id = "r030" > < /input></td >
-        <td><input id="txt"></input></td>
-        <td><input id="quantity"></input></td>
-        <td><input id="cc"></input></td>
-        <td><input id="rate"></input></td>
-        <td id="dateInput"></td>
-        <td><button id='del'>Delete</button></td></tr>`;
-    html += htmlSegment;
-    let container = document.querySelector('.container');
-    container.innerHTML = html;
-    let htmlDate = '';
-    let htmlDateFilling = `Дані на ${dateFromField}`;
-    htmlDate += htmlDateFilling;
-    let containerDate = document.querySelector('.fillCurrentgDate');
-    containerDate.innerHTML = htmlDate;
-}
-
-
-function onBtnSave() {
-    let date = dateTable;
-    let dateFromField = date[6] + date[7] + "." + date[4] + date[5] + "." + date[0] + date[1] + date[2] + date[3];
-    let newCurr = new Object();
-    newCurr.r030 = document.getElementById('r030').value;
-    newCurr.txt = document.getElementById('txt').value;
-    newCurr.quantity = document.getElementById('quantity').value;
-    newCurr.cc = document.getElementById('cc').value;
-    newCurr.rate = document.getElementById('rate').value;
-    newCurr.id = document.getElementById('r030').value;
-    newCurr.quantity = document.getElementById('quantity').value;
-    newCurr.cc = document.getElementById('cc').value;
-    newCurr.exchangedate = dateFromField;
-    service.create(newCurr, date);
-    document.getElementById('dateInput').value = "";
-    document.getElementById('r030').value = "";
-    document.getElementById('txt').value = "";
-    document.getElementById('quantity').value = "";
-    document.getElementById('cc').value = "";
-    document.getElementById('rate').value = "";
-    drawTable(date);
-}
-
-
 async function onBtnDel(id) {
     let result = confirm("Do you really want to delete?");
     if (result) {
         service.delete(id, dateTable);
-        let date = getChoosenDate()
         let array = await service.getLocalData(dateTable);
         drawTable(dateTable, array);
     }
 }
 
+async function onBtnUpdate(id) {
+    let arrayCurrency = await service.getLocalData(dateTable);
+    let html = '';
+    let ind = service.read(id, dateTable);
+    for (let i = 0; i < arrayCurrency.length; i++) {
+        if (i === ind) {
+            let htmlSegment = `
+            <td><input id="r030Save" value = "${arrayCurrency[ind].r030}" style="text-align: center" maxlength = "4"></td>
+            <td ><input id="textSave" value = "${ arrayCurrency[ind].txt}" style="text-align: left" maxlength = "20"></td>
+            <td><input id="quantitySave" value = "${ arrayCurrency[ind].quantity}" style="text-align: center" maxlength = "4"></td>
+            <td><input id="ccSave" value = "${arrayCurrency[ind].cc}" style="text-align: center" maxlength = "3"></td>
+            <td><input id="rateSave" value = "${arrayCurrency[ind].rate}" style="text-align: center"></td>
+            <td> ${arrayCurrency[ind].exchangedate} </td>
+            <td><button type = "submit" onclick = "onBtnSave(${arrayCurrency[i].id})">Save</button>
+            <button onclick = "onBtnCancel()">Cancel</button></td>`;
+            html += htmlSegment;
+            i++;
+        }
+        let htmlSegment = `<tr>
+            <td> ${arrayCurrency[i].r030} </td>
+            <td style="text-align: left"> ${ arrayCurrency[i].txt} </td>
+            <td>${ arrayCurrency[i].quantity}</td>
+            <td > ${arrayCurrency[i].cc} </td>
+            <td > ${arrayCurrency[i].rate} </td>
+            <td> ${arrayCurrency[i].exchangedate} </td>
+            <td><button onclick="onBtnUpdate(${arrayCurrency[i].id})">Update</button>
+            <button id='del' onclick="onBtnDel(${arrayCurrency[i].id})">Delete</button></td><tr>`;
+        html += htmlSegment;
+    }
+    let container = document.querySelector('.container');
+    container.innerHTML = html;
+}
+
+async function onBtnSave(id) {
+    let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
+    let array = await service.getLocalData(dateTable);
+    let newCurr = new Object();
+    newCurr.r030 = document.getElementById('r030Save').value;
+    newCurr.txt = document.getElementById('textSave').value;
+    newCurr.quantity = document.getElementById('quantitySave').value;
+    newCurr.cc = document.getElementById('ccSave').value;
+    newCurr.rate = document.getElementById('rateSave').value;
+    newCurr.exchangedate = dateFromField;
+    let error = validateCurrency(newCurr);
+    if (error) {
+        alert(error);
+        return;
+    }
+    let ind = service.read(id, dateTable);
+    service.update(newCurr, ind, dateTable, id);
+    array = await service.getLocalData(dateTable);
+    drawTable(dateTable, array);
+}
+
+function validateCurrency(currency) {
+    if (!currency.r030 || !currency.txt || !currency.quantity || !currency.cc || !currency.rate) {
+        return "Треба заповнити поле!"
+    }
+    if (!currency.r030.match(/[0-9]/)) {
+        return "Поле 'код цифровий' має містити мах 4 цифри!"
+    }
+    if (currency.txt.match(/^[A-Za-z]+$/)) {
+        return "Поле 'код літеральний' має містити тільки літери!"
+    }
+    if (!currency.quantity.match(/[0-9]/)) {
+        return "Поле 'кількість одиниць валюти' має містити мах 4 цифри!"
+    }
+    if (!currency.cc.match(/[A-Z]/)) {
+        return "Поле 'назва валюти' має містити тільки 3 великих літери!"
+    }
+    if (!currency.rate.match(/\d+(,\d{,8})?/)) {
+        return "Поле 'офіційний курс' має містити мах 8 цифри після 'коми'!"
+    }
+    return null;
+}
+
+async function onBtnCancel() {
+    let array = await service.getLocalData(dateTable);
+    drawTable(dateTable, array);
+}
+
+// async function onBtnAdd(date) {
+//     date = dateTable;//     
+//     let dateFromField = date[6] + date[7] + "." + date[4] + date[5] + "." + date[0] + date[1] + date[2] + date[3];
+//     let html = '';
+//     let htmlSegment = `
+//     <td><input id="r030"></input></td>
+//         <td><input id="txt"></input></td>
+//         <td><input id="quantity"></input></td>
+//         <td><input id="cc"></input></td>
+//         <td><input id="rate"></input></td>
+//         <td id="dateInput">${dateFromField}</td>
+//         <td><button id='del'>Delete</button></td>`;
+//     html += htmlSegment;
+//     let container = document.querySelector('.container');
+//     container.innerHTML = html;
+//     let htmlDate = '';
+//     let htmlDateFilling = `Дані на ${dateFromField}`;
+//     htmlDate += htmlDateFilling;
+//     let containerDate = document.querySelector('.fillCurrentgDate');
+//     containerDate.innerHTML = htmlDate;
+// }
+
+window.onBtnUpdate = onBtnUpdate;
+window.onBtnCancel = onBtnCancel;
 window.onBtnDel = onBtnDel;
 window.onBtnShowFromLocalStorage = onBtnShowFromLocalStorage;
-window.onBtnAdd = onBtnAdd;
+//window.onBtnAdd = onBtnAdd;
 window.onBtnSave = onBtnSave;
 window.onBtnReloadFromServer = onBtnReloadFromServer;
-
-/* <!-- <button><img src="pngwing.com.png " width="15 " height="15 " alt="Корзина " 
-            style="vertical-align: middle "> Delete</button></p> -->*/
