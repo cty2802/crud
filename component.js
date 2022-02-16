@@ -29,7 +29,7 @@ function drawTable(date, arrayCurrency) {
     let htmlDate = '';
     let htmlDateFilling = `Дані на ${date[6] + date[7] + "." + date[4] + date[5] + "." + date[0] + date[1] + date[2] + date[3]}`;
     htmlDate += htmlDateFilling;
-    let containerDate = document.querySelector('.fillCurrentgDate');
+    let containerDate = document.querySelector('.fillCurrentDate');
     containerDate.innerHTML = htmlDate;
 }
 
@@ -167,7 +167,7 @@ async function onBtnAdd() {
     let htmlDate = '';
     let htmlDateFilling = `Дані на ${dateFromField}`;
     htmlDate += htmlDateFilling;
-    let containerDate = document.querySelector('.fillCurrentgDate');
+    let containerDate = document.querySelector('.fillCurrentDate');
     containerDate.innerHTML = htmlDate;
 }
 
@@ -192,7 +192,13 @@ async function onBtnSaveForAdd() {
     drawTable(dateTable, array);
 }
 
+async function filterInput() {
+    let inputForFilter = document.getElementById('enterFilter').value;
+    let array = await service.getLocalData(dateTable, inputForFilter);
+    drawTable(dateTable, array);
+}
 
+window.filterInput = filterInput
 window.onBtnSaveForAdd = onBtnSaveForAdd;
 window.onBtnUpdate = onBtnUpdate;
 window.onBtnCancel = onBtnCancel;

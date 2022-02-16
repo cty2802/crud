@@ -15,9 +15,10 @@
     <P>Choose date: <input type="date" name="calendar" id="chooseDate">
         <button id="btnShowFromLocalStorage" onclick="onBtnShowFromLocalStorage()">Show from local storage</button>
         <button id=" btnReloadFromServer " onclick="onBtnReloadFromServer()">Reload from server</button></P>
-    <p><button id="add " onclick="onBtnAdd() ">Add</button>
-        <p class="fillCurrentgDate "></p>
-        <table>
+    <p><button id="add " onclick="onBtnAdd()">Add</button>
+        <input id="enterFilter" placeholder="Enter filter" onkeyup="filterInput()">
+        <p class="fillCurrentDate "></p>
+        <table id="table">
             <thead>
                 <tr id="title">
                     <td>Код цифровий</td>

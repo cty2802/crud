@@ -28,14 +28,20 @@ class Service {
         return arrayCurrency;
     }
 
-    getLocalData(dateChoosen) {
+    getLocalData(dateChoosen, filterStr) {
         let arrayCurrency = [];
         arrayCurrency = JSON.parse(localStorage.getItem(dateChoosen));
-        if (localStorage[`${dateChoosen}`]) {
-            return arrayCurrency;
-        } else {
+        if (!localStorage[`${dateChoosen}`] || !filterStr) {
             this.getServerData(dateChoosen);
             return arrayCurrency;
+        } else {
+            let newArray = [];
+            for (let i = 0; i < arrayCurrency.length; i++) {
+                if (arrayCurrency[i].r030 === filterStr || arrayCurrency[i].txt === filterStr || arrayCurrency[i].cc === filterStr) {
+                    newArray.push(arrayCurrency[i]);
+                }
+            }
+            return newArray;
         }
     }
 
@@ -69,6 +75,5 @@ class Service {
         localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
     }
 }
-
 
 export { Service };
