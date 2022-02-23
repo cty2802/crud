@@ -28,13 +28,14 @@ class Service {
         return arrayCurrency;
     }
 
-    getLocalData(dateChoosen, filterStr) {
+    getLocalData(dateChoosen, filterStr, trigger, obj) {
         let arrayCurrency = [];
         arrayCurrency = JSON.parse(localStorage.getItem(dateChoosen));
-        if (!localStorage[`${dateChoosen}`] || !filterStr) {
+        if (!localStorage[`${dateChoosen}`]) {
             this.getServerData(dateChoosen);
             return arrayCurrency;
-        } else {
+        }
+        if (filterStr) {
             let newArray = [];
             for (let i = 0; i < arrayCurrency.length; i++) {
                 if (arrayCurrency[i].r030 === filterStr || arrayCurrency[i].txt === filterStr || arrayCurrency[i].cc === filterStr) {
@@ -43,21 +44,57 @@ class Service {
             }
             return newArray;
         }
+        if (trigger === "up") {
+            if (obj === 'r030' || obj === 'rate') {
+                arrayCurrency.sort(function(a, b) { return a[obj] - b[obj] });
+            } else {
+                arrayCurrency.sort(function(a, b) {
+                    let objA = a[obj].toUpperCase();
+                    let objB = b[obj].toUpperCase();
+                    if (objA < objB) {
+                        return -1;
+                    }
+                    if (objA > objB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            }
+        }
+        if (trigger === "down") {
+            if (obj === 'r030' || obj === 'rate') {
+                arrayCurrency.sort(function(a, b) { return b[obj] - a[obj] });
+            } else {
+                arrayCurrency.sort(function(a, b) {
+                    let objA = a[obj].toUpperCase();
+                    let objB = b[obj].toUpperCase();
+                    if (objA > objB) {
+                        return -1;
+                    }
+                    if (objA < objB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            }
+        }
+        return arrayCurrency;
     }
 
     create(obj, date) {
-        let arrayCurrency = this.getLocalData(date);
+        let arrayCurrency = this.getLocalData(date, null, null, null);
         arrayCurrency.push(obj);
         localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
     }
 
     delete(id, date) {
-        let arrayCurrency = this.getLocalData(date);
+        let arrayCurrency = this.getLocalData(date, null, null, null);
         let ind = arrayCurrency.findIndex((el) => {
             return el.id == id;
         });
         arrayCurrency.splice(ind, 1);
-        localStorage.setItem(`${date}`, JSON.stringify(arrayCurrency));
+        //console.log(arrayCurrency);
+        localStorage.setItem(date, JSON.stringify(arrayCurrency));
     }
 
     read(id, date) {

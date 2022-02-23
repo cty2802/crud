@@ -1,6 +1,7 @@
 import { Service } from './module/service.js';
 let service = new Service();
 let dateTable = null;
+let trigger = "up";
 
 function getChoosenDate() {
     let date = document.getElementById('chooseDate');
@@ -16,8 +17,8 @@ function drawTable(date, arrayCurrency) {
             <td> ${arrayCurrency[i].r030} </td>
             <td style="text-align: left"> ${ arrayCurrency[i].txt} </td>
             <td>${ arrayCurrency[i].quantity}</td>
-            <td > ${arrayCurrency[i].cc} </td>
-           <td > ${arrayCurrency[i].rate} </td>
+            <td> ${arrayCurrency[i].cc} </td>
+           <td> ${arrayCurrency[i].rate} </td>
             <td> ${arrayCurrency[i].exchangedate} </td>
             <td><button onclick="onBtnUpdate(${arrayCurrency[i].id})">Update</button>
             <button id='del' onclick="onBtnDel(${arrayCurrency[i].id})"><img src="pngwing.com.png " width="15 " height="15 " alt="Корзина " 
@@ -42,21 +43,23 @@ async function onBtnReloadFromServer() {
 
 async function onBtnShowFromLocalStorage() {
     let date = getChoosenDate();
-    let array = await service.getLocalData(date);
+    let array = await service.getLocalData(date, null, null, null);
     drawTable(date, array);
 }
 
 async function onBtnDel(id) {
+    let inputForFilter = document.getElementById('enterFilter').value;
     let result = confirm("Do you really want to delete?");
     if (result) {
         service.delete(id, dateTable);
-        let array = await service.getLocalData(dateTable);
+        let array = await service.getLocalData(dateTable, inputForFilter, null, null);
         drawTable(dateTable, array);
     }
 }
 
 async function onBtnUpdate(id) {
-    let arrayCurrency = await service.getLocalData(dateTable);
+    let inputForFilter = document.getElementById('enterFilter').value;
+    let arrayCurrency = await service.getLocalData(dateTable, inputForFilter, null, null);
     let html = '';
     let ind = service.read(id, dateTable);
     for (let i = 0; i < arrayCurrency.length; i++) {
@@ -90,7 +93,7 @@ async function onBtnUpdate(id) {
 
 async function onBtnSaveForUpdate(id) {
     let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
-    let array = await service.getLocalData(dateTable);
+    let array = await service.getLocalData(dateTable, null, null, null);
     let newCurr = new Object();
     newCurr.r030 = document.getElementById('r030Save').value;
     newCurr.txt = document.getElementById('textSave').value;
@@ -132,14 +135,15 @@ function validateCurrency(currency) {
 }
 
 async function onBtnCancel() {
-    let array = await service.getLocalData(dateTable);
+    let array = await service.getLocalData(dateTable, null, null, null);
     drawTable(dateTable, array);
 }
 
 async function onBtnAdd() {
+    let inputForFilter = document.getElementById('enterFilter').value;
     let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
     let html = '';
-    let arrayCurrency = await service.getLocalData(dateTable);
+    let arrayCurrency = await service.getLocalData(dateTable, inputForFilter, null, null);
     let htmlSegment = `
     <td><input id="r030Add"></input></td>
         <td><input id="textAdd"></input></td>
@@ -173,7 +177,7 @@ async function onBtnAdd() {
 
 async function onBtnSaveForAdd() {
     let dateFromField = dateTable[6] + dateTable[7] + "." + dateTable[4] + dateTable[5] + "." + dateTable[0] + dateTable[1] + dateTable[2] + dateTable[3];
-    let array = await service.getLocalData(dateTable);
+    let array = await service.getLocalData(dateTable, null, null, null);
     let newCurr = new Object();
     newCurr.r030 = document.getElementById('r030Add').value;
     newCurr.txt = document.getElementById('textAdd').value;
@@ -188,17 +192,71 @@ async function onBtnSaveForAdd() {
         return;
     }
     service.create(newCurr, dateTable);
-    array = await service.getLocalData(dateTable);
+    array = await service.getLocalData(dateTable, null, null, null);
     drawTable(dateTable, array);
 }
 
 async function filterInput() {
     let inputForFilter = document.getElementById('enterFilter').value;
-    let array = await service.getLocalData(dateTable, inputForFilter);
+    let array = await service.getLocalData(dateTable, inputForFilter, null, null);
     drawTable(dateTable, array);
 }
 
-window.filterInput = filterInput
+async function onBtnSort(id, nameSort) {
+    let inputForFilter = document.getElementById('enterFilter').value;
+    if (trigger === "down") {
+        if (nameSort === 'r030') {
+            document.getElementById(id).value = String.fromCharCode(8593);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else if (nameSort === 'txt') {
+            document.getElementById(id).value = String.fromCharCode(8593);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else if (nameSort === 'cc') {
+            document.getElementById(id).value = String.fromCharCode(8593);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else {
+            document.getElementById(id).value = String.fromCharCode(8593);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+        }
+        trigger = "up"
+    } else {
+        if (nameSort === 'r030') {
+            document.getElementById(id).value = String.fromCharCode(8595);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else if (nameSort === 'txt') {
+            document.getElementById(id).value = String.fromCharCode(8595);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else if (nameSort === 'cc') {
+            document.getElementById(id).value = String.fromCharCode(8595);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortRate').value = String.fromCharCode(8593, 8595);
+        } else {
+            document.getElementById(id).value = String.fromCharCode(8595);
+            document.getElementById('sortTxt').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortCc').value = String.fromCharCode(8593, 8595);
+            document.getElementById('sortR030').value = String.fromCharCode(8593, 8595);
+        }
+        trigger = "down";
+    }
+    let array = await service.getLocalData(dateTable, inputForFilter, trigger, nameSort);
+    drawTable(dateTable, array);
+}
+
+window.onBtnSort = onBtnSort;
+window.filterInput = filterInput;
 window.onBtnSaveForAdd = onBtnSaveForAdd;
 window.onBtnUpdate = onBtnUpdate;
 window.onBtnCancel = onBtnCancel;
